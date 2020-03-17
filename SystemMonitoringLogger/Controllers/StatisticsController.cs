@@ -16,12 +16,10 @@ namespace SystemMonitoringLogger.Controllers
     public class StatisticsController : ControllerBase
     {
         private readonly SystemMonitoringLoggerContext _context;
-        private readonly IMqttService _mqttService;
 
-        public StatisticsController(SystemMonitoringLoggerContext context, IMqttService mqttService)
+        public StatisticsController(SystemMonitoringLoggerContext context)
         {
             _context = context;
-            _mqttService = mqttService;
         }
 
         [HttpGet]
