@@ -12,6 +12,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using SystemMonitoringLogger.Data;
+using SystemMonitoringLogger.Services;
 
 namespace SystemMonitoringLogger
 {
@@ -34,6 +35,8 @@ namespace SystemMonitoringLogger
 
             services.AddDbContext<SystemMonitoringLoggerContext>(options =>
                     options.UseSqlServer(Configuration.GetConnectionString("SystemMonitoringLoggerContext")));
+
+            services.AddSingleton<IMqttService, MqttService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
