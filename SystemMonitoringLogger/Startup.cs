@@ -31,6 +31,9 @@ namespace SystemMonitoringLogger
 
             services.AddDbContext<SystemMonitoringLoggerContext>(options =>
                     options.UseSqlServer(Configuration.GetConnectionString("SystemMonitoringLoggerContext")));
+
+            services.AddDbContext<SystemMonitoringLoggerContext>(options =>
+                    options.UseSqlServer(Configuration.GetConnectionString("SystemMonitoringLoggerContext")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

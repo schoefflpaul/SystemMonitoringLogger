@@ -2,15 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SystemMonitoringLogger.Data;
 using SystemMonitoringLogger.Entities;
 
 namespace SystemMonitoringLogger.Controllers
 {
-    public class SystemInfoesController : Controller
+    [Route("api/[controller]")]
+    [ApiController]
+    public class SystemInfoesController : ControllerBase
     {
         private readonly SystemMonitoringLoggerContext _context;
 
@@ -19,130 +21,99 @@ namespace SystemMonitoringLogger.Controllers
             _context = context;
         }
 
-        // GET: SystemInfoes
-        public async Task<IActionResult> Index()
+        // GET: api/SystemInfoes
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<SystemInfo>>> GetSystemInfo()
         {
-            return View(await _context.SystemInfo.ToListAsync());
+            return await _context.SystemInfo.ToListAsync();
         }
 
-        // GET: SystemInfoes/Details/5
-        public async Task<IActionResult> Details(string id)
+        // GET: api/SystemInfoes/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<SystemInfo>> GetSystemInfo(string id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var systemInfo = await _context.SystemInfo
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (systemInfo == null)
-            {
-                return NotFound();
-            }
-
-            return View(systemInfo);
-        }
-
-        // GET: SystemInfoes/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: SystemInfoes/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id")] SystemInfo systemInfo)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(systemInfo);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(systemInfo);
-        }
-
-        // GET: SystemInfoes/Edit/5
-        public async Task<IActionResult> Edit(string id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             var systemInfo = await _context.SystemInfo.FindAsync(id);
+
             if (systemInfo == null)
             {
                 return NotFound();
             }
-            return View(systemInfo);
+
+            return systemInfo;
         }
 
-        // POST: SystemInfoes/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("Id")] SystemInfo systemInfo)
+        // PUT: api/SystemInfoes/5
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
+        // more details see https://aka.ms/RazorPagesCRUD.
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutSystemInfo(string id, SystemInfo systemInfo)
         {
             if (id != systemInfo.Id)
             {
-                return NotFound();
+                return BadRequest();
             }
 
-            if (ModelState.IsValid)
+            _context.Entry(systemInfo).State = EntityState.Modified;
+
+            try
             {
-                try
-                {
-                    _context.Update(systemInfo);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!SystemInfoExists(systemInfo.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                await _context.SaveChangesAsync();
             }
-            return View(systemInfo);
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!SystemInfoExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
         }
 
-        // GET: SystemInfoes/Delete/5
-        public async Task<IActionResult> Delete(string id)
+        // POST: api/SystemInfoes
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
+        // more details see https://aka.ms/RazorPagesCRUD.
+        [HttpPost]
+        public async Task<ActionResult<SystemInfo>> PostSystemInfo(SystemInfo systemInfo)
         {
-            if (id == null)
+            _context.SystemInfo.Add(systemInfo);
+            try
             {
-                return NotFound();
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                if (SystemInfoExists(systemInfo.Id))
+                {
+                    return Conflict();
+                }
+                else
+                {
+                    throw;
+                }
             }
 
-            var systemInfo = await _context.SystemInfo
-                .FirstOrDefaultAsync(m => m.Id == id);
+            return CreatedAtAction("GetSystemInfo", new { id = systemInfo.Id }, systemInfo);
+        }
+
+        // DELETE: api/SystemInfoes/5
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<SystemInfo>> DeleteSystemInfo(string id)
+        {
+            var systemInfo = await _context.SystemInfo.FindAsync(id);
             if (systemInfo == null)
             {
                 return NotFound();
             }
 
-            return View(systemInfo);
-        }
-
-        // POST: SystemInfoes/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(string id)
-        {
-            var systemInfo = await _context.SystemInfo.FindAsync(id);
             _context.SystemInfo.Remove(systemInfo);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            return systemInfo;
         }
 
         private bool SystemInfoExists(string id)
