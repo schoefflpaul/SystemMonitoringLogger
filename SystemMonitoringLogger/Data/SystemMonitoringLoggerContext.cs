@@ -14,6 +14,6 @@ namespace SystemMonitoringLogger.Data
         {
         }
 
-        public DbSet<SystemMonitoringLogger.Entities.SystemInfo> SystemInfo { get; set; }
+        public DbSet<Measurement> Measurements { get; set; }
     }
 }

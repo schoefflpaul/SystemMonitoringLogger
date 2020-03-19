@@ -10,8 +10,8 @@ using SystemMonitoringLogger.Data;
 namespace SystemMonitoringLogger.Migrations
 {
     [DbContext(typeof(SystemMonitoringLoggerContext))]
-    [Migration("20200317123409_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20200319122148_Init")]
+    partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -42,6 +42,26 @@ namespace SystemMonitoringLogger.Migrations
                     b.ToTable("Cpu");
                 });
 
+            modelBuilder.Entity("SystemMonitoringLogger.Entities.Measurement", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int?>("SystemInfoId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SystemInfoId");
+
+                    b.ToTable("Measurements");
+                });
+
             modelBuilder.Entity("SystemMonitoringLogger.Entities.Ram", b =>
                 {
                     b.Property<int>("Id")
@@ -62,11 +82,16 @@ namespace SystemMonitoringLogger.Migrations
 
             modelBuilder.Entity("SystemMonitoringLogger.Entities.SystemInfo", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int?>("CpuId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("RamId")
                         .HasColumnType("int");
@@ -78,6 +103,13 @@ namespace SystemMonitoringLogger.Migrations
                     b.HasIndex("RamId");
 
                     b.ToTable("SystemInfo");
+                });
+
+            modelBuilder.Entity("SystemMonitoringLogger.Entities.Measurement", b =>
+                {
+                    b.HasOne("SystemMonitoringLogger.Entities.SystemInfo", "SystemInfo")
+                        .WithMany()
+                        .HasForeignKey("SystemInfoId");
                 });
 
             modelBuilder.Entity("SystemMonitoringLogger.Entities.SystemInfo", b =>

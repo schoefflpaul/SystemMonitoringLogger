@@ -8,8 +8,8 @@ namespace SystemMonitoringLogger.Entities
 {
     public class SystemInfo
     {
-        [Key]
-        public string Id { get; set; }
+        public int Id { get; set; }
+        public string Name { get; set; }
         public Cpu Cpu { get; set; }
         public Ram Ram { get; set; }
     }

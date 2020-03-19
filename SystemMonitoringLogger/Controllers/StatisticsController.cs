@@ -24,12 +24,12 @@ namespace SystemMonitoringLogger.Controllers
 
         [HttpGet]
         [Route("{id}")]
-        public async Task<SystemInfo[]> GetStatisticsForDevice(string id)
+        public async Task<Measurement[]> GetStatisticsForDevice(string id)
         {
-            return await _context.SystemInfo
-                .Include(e => e.Cpu)
-                .Include(r => r.Ram)
-                .Where(sys => sys.Id == id)
+            return await _context.Measurements
+                .Include(m => m.SystemInfo).ThenInclude(s => s.Cpu)
+                .Include(m => m.SystemInfo).ThenInclude(s => s.Ram)
+                .Where(m => m.SystemInfo.Name == id)
                 .ToArrayAsync();
         }
     }

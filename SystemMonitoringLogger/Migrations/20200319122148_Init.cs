@@ -1,8 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace SystemMonitoringLogger.Migrations
 {
-    public partial class InitialMigration : Migration
+    public partial class Init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -39,7 +40,9 @@ namespace SystemMonitoringLogger.Migrations
                 name: "SystemInfo",
                 columns: table => new
                 {
-                    Id = table.Column<string>(nullable: false),
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(nullable: true),
                     CpuId = table.Column<int>(nullable: true),
                     RamId = table.Column<int>(nullable: true)
                 },
@@ -60,6 +63,31 @@ namespace SystemMonitoringLogger.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Measurements",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SystemInfoId = table.Column<int>(nullable: true),
+                    Timestamp = table.Column<DateTime>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Measurements", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Measurements_SystemInfo_SystemInfoId",
+                        column: x => x.SystemInfoId,
+                        principalTable: "SystemInfo",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Measurements_SystemInfoId",
+                table: "Measurements",
+                column: "SystemInfoId");
+
             migrationBuilder.CreateIndex(
                 name: "IX_SystemInfo_CpuId",
                 table: "SystemInfo",
@@ -73,6 +101,9 @@ namespace SystemMonitoringLogger.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "Measurements");
+
             migrationBuilder.DropTable(
                 name: "SystemInfo");
 

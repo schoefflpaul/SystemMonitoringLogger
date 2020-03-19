@@ -54,7 +54,7 @@ namespace SystemMonitoringLogger
                 endpoints.MapControllers();
             });
 
-            new MqttService(app.ApplicationServices.CreateScope(),"systemInfo").Listen();
+            Task.Run(() => new MqttService(app.ApplicationServices.CreateScope(),"systemInfo").Listen());
         }
     }
 }

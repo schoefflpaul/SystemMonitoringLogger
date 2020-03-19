@@ -31,13 +31,13 @@ namespace SystemMonitoringLogger.Services
             client.MqttMsgPublishReceived += OnReceiveMessage;
             client.Subscribe(new []{Topic},new []{ MqttMsgBase.QOS_LEVEL_AT_MOST_ONCE });
         } 
-        async void OnReceiveMessage(object sender, MqttMsgPublishEventArgs e)
+        private async void OnReceiveMessage(object sender, MqttMsgPublishEventArgs e)
         {
             var message = Encoding.Default.GetString(e.Message);
-            var sensorValue = JsonConvert.DeserializeObject<SystemInfo>(message);
+            var sensorValue = JsonConvert.DeserializeObject<Measurement>(message);
             var context = _provider.ServiceProvider.GetService<SystemMonitoringLoggerContext>();
-            await context.SystemInfo.AddAsync(sensorValue);
-            await context.SaveChangesAsync();
+            context.Measurements.Add(sensorValue);
+            context.SaveChanges();
         }
     }
 }
