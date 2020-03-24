@@ -8,6 +8,7 @@ using SystemMonitoringLogger.Data;
 using SystemMonitoringLogger.Entities;
 using SystemMonitoringLogger.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 
 namespace SystemMonitoringLogger.Controllers
 {
@@ -24,16 +25,26 @@ namespace SystemMonitoringLogger.Controllers
 
         [HttpGet]
         [Route("{deviceName}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<Measurement[]> GetStatisticsForDevice(string deviceName, int pageIndex = 0, int pageSize = 100)
         {
             return await _context.Measurements
                 .Include(m => m.SystemInfo).ThenInclude(s => s.Cpu)
                 .Include(m => m.SystemInfo).ThenInclude(s => s.Ram)
-                .Where(m => m.SystemInfo.Name == deviceName).Skip(pageIndex * pageSize).Take(pageSize)
+                .Where(m => m.SystemInfo.Name == deviceName)
+                .OrderByDescending(m => m.Timestamp)
+                .Skip(pageIndex * pageSize)
+                .Take(pageSize)
                 .ToArrayAsync();
         }
+        //DESKTOP-JPLO7L8
 
-
-
+        [HttpGet]
+        [Route("{deviceName}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<Measurement[]> GetStatisticsForDeviceInTimeFrame(string deviceName, DateTime from, DateTime to ,int pageIndex = 0, int pageSize = 100)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
