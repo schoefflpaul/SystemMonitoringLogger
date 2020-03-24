@@ -23,14 +23,17 @@ namespace SystemMonitoringLogger.Controllers
         }
 
         [HttpGet]
-        [Route("{id}")]
-        public async Task<Measurement[]> GetStatisticsForDevice(string id)
+        [Route("{deviceName}")]
+        public async Task<Measurement[]> GetStatisticsForDevice(string deviceName, int pageIndex = 0, int pageSize = 100)
         {
             return await _context.Measurements
                 .Include(m => m.SystemInfo).ThenInclude(s => s.Cpu)
                 .Include(m => m.SystemInfo).ThenInclude(s => s.Ram)
-                .Where(m => m.SystemInfo.Name == id)
+                .Where(m => m.SystemInfo.Name == deviceName).Skip(pageIndex * pageSize).Take(pageSize)
                 .ToArrayAsync();
         }
+
+
+
     }
 }

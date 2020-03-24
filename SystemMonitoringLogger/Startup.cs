@@ -33,6 +33,29 @@ namespace SystemMonitoringLogger
             services.AddDbContext<SystemMonitoringLoggerContext>(options =>
                     options.UseSqlServer(Configuration.GetConnectionString("SystemMonitoringLoggerContext")));
 
+            services.AddSwaggerDocument(config =>
+            {
+                config.PostProcess = document =>
+                {
+                    document.Info.Version = "v1";
+                    document.Info.Title = "SystemMonitoring Logger API";
+                    document.Info.Description = "A data logger Api for mqtt- measurments";
+                    document.Info.TermsOfService = "None";
+                    document.Info.Contact = new NSwag.OpenApiContact
+                    {
+                        Name = "4AHIF SystemMonitoring",
+                        Email = string.Empty,
+                        Url = "https://htl-leonding.at"
+                    };
+                    document.Info.License = new NSwag.OpenApiLicense
+                    {
+                        Name = "Use under LICX",
+                        Url = "https://example.com/license"
+                    };
+                };
+            });
+
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -54,7 +77,11 @@ namespace SystemMonitoringLogger
                 endpoints.MapControllers();
             });
 
+            app.UseOpenApi();
+            app.UseSwaggerUi3();
+
             Task.Run(() => new MqttService(app.ApplicationServices.CreateScope(),"systemInfo").Listen());
+
         }
     }
 }
