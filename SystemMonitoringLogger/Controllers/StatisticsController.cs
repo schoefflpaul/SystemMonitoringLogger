@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SystemMonitoringLogger.Data;
-using SystemMonitoringLogger.Entities;
-using SystemMonitoringLogger.Services;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using SystemMonitoringLogger.Dtos;
 
 namespace SystemMonitoringLogger.Controllers
@@ -27,7 +23,7 @@ namespace SystemMonitoringLogger.Controllers
         [HttpGet]
         [Route("{deviceName}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<MeasurementDto[]> GetStatisticsForDevice(string deviceName, int pageIndex = 0, int pageSize = 100)
+        public async Task<ActionResult<MeasurementDto[]>> GetStatisticsForDevice(string deviceName, int pageIndex = 0, int pageSize = 100)
         {
             return await _context.Measurements
                 .Include(m => m.SystemInfo).ThenInclude(s => s.Cpu)
@@ -42,19 +38,27 @@ namespace SystemMonitoringLogger.Controllers
         //DESKTOP-JPLO7L8
 
         [HttpGet]
-        [Route("{deviceName}")]
+        [Route("timeframe/{deviceName}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<MeasurementDto[]> GetStatisticsForDeviceInTimeFrame(string deviceName, DateTime from, DateTime to ,int pageIndex = 0, int pageSize = 100)
+        public async Task<ActionResult<MeasurementDto[]>> GetStatisticsForDeviceInTimeFrame(string deviceName, string from, string to ,int pageIndex = 0, int pageSize = 100)
         {
-            return await _context.Measurements
-                .Include(m => m.SystemInfo).ThenInclude(s => s.Cpu)
-                .Include(m => m.SystemInfo).ThenInclude(s => s.Ram)
-                .Where(m => m.SystemInfo.Name == deviceName && m.Timestamp >= from && m.Timestamp <= to)
-                .OrderByDescending(m => m.Timestamp)
-                .Skip(pageIndex * pageSize)
-                .Take(pageSize)
-                .Select(m => new MeasurementDto(m))
-                .ToArrayAsync();
+            DateTime fromTime, toTime;
+
+            if (DateTime.TryParse(from, out fromTime) && DateTime.TryParse(to, out toTime))
+            {
+                return await _context.Measurements
+                    .Include(m => m.SystemInfo).ThenInclude(s => s.Cpu)
+                    .Include(m => m.SystemInfo).ThenInclude(s => s.Ram)
+                    .Where(m => m.SystemInfo.Name == deviceName && m.Timestamp >= fromTime && m.Timestamp <= toTime)
+                    .OrderByDescending(m => m.Timestamp)
+                    .Skip(pageIndex * pageSize)
+                    .Take(pageSize)
+                    .Select(m => new MeasurementDto(m))
+                    .ToArrayAsync();
+
+            }
+
+            return BadRequest("Date time not valid");
         }
     }
 }
