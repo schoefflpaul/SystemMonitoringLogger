@@ -11,11 +11,11 @@ namespace SystemMonitoringLogger.Dtos
         public string Name { get; set; }
         public CpuDto Cpu { get; set; }
         public RamDto Ram { get; set; }
-        public SystemInfoDto(string name, CpuDto cpu, RamDto ram)
+        public SystemInfoDto(SystemInfo systemInfo)
         {
-            Name = name;
-            Cpu = cpu;
-            Ram = ram;
+            Name = systemInfo.Name;
+            Cpu = new CpuDto(systemInfo.Cpu);
+            Ram = new RamDto(systemInfo.Ram);
         }
     }
 }

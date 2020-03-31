@@ -33,10 +33,10 @@ namespace SystemMonitoringLogger.Controllers
                 .Include(m => m.SystemInfo).ThenInclude(s => s.Cpu)
                 .Include(m => m.SystemInfo).ThenInclude(s => s.Ram)
                 .Where(m => m.SystemInfo.Name == deviceName)
-                .Select(mGroup => new MeasurementDto(new SystemInfoDto(deviceName, new CpuDto(mGroup.SystemInfo.Cpu.Baseclock, mGroup.SystemInfo.Cpu.Currentclock, mGroup.SystemInfo.Cpu.Utilisation), new RamDto(mGroup.SystemInfo.Ram.Used, mGroup.SystemInfo.Ram.Max)), mGroup.Timestamp))
                 .OrderByDescending(m => m.Timestamp)
                 .Skip(pageIndex * pageSize)
                 .Take(pageSize)
+                .Select(m => new MeasurementDto(m))
                 .ToArrayAsync();
         }
         //DESKTOP-JPLO7L8
@@ -50,10 +50,10 @@ namespace SystemMonitoringLogger.Controllers
                 .Include(m => m.SystemInfo).ThenInclude(s => s.Cpu)
                 .Include(m => m.SystemInfo).ThenInclude(s => s.Ram)
                 .Where(m => m.SystemInfo.Name == deviceName && m.Timestamp >= from && m.Timestamp <= to)
-                .Select(mGroup => new MeasurementDto(new SystemInfoDto(deviceName, new CpuDto(mGroup.SystemInfo.Cpu.Baseclock, mGroup.SystemInfo.Cpu.Currentclock, mGroup.SystemInfo.Cpu.Utilisation), new RamDto(mGroup.SystemInfo.Ram.Used, mGroup.SystemInfo.Ram.Max)), mGroup.Timestamp))
                 .OrderByDescending(m => m.Timestamp)
                 .Skip(pageIndex * pageSize)
                 .Take(pageSize)
+                .Select(m => new MeasurementDto(m))
                 .ToArrayAsync();
         }
     }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using SystemMonitoringLogger.Entities;
 
 namespace SystemMonitoringLogger.Dtos
 {
@@ -11,11 +12,11 @@ namespace SystemMonitoringLogger.Dtos
         public int Currentclock { get; set; }
         public int Utilisation { get; set; }
 
-        public CpuDto(int baseClock, int currentClock, int utilisation)
+        public CpuDto(Cpu cpu)
         {
-            Baseclock = baseClock;
-            Currentclock = currentClock;
-            Utilisation = utilisation;
+            Baseclock = cpu.Baseclock;
+            Currentclock = cpu.Currentclock;
+            Utilisation = cpu.Utilisation;
         }
 
     }

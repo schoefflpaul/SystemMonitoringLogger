@@ -14,10 +14,10 @@ namespace SystemMonitoringLogger.Dtos
         [DataType(DataType.DateTime)]
         public DateTime Timestamp { get; set; }
 
-        public MeasurementDto(SystemInfoDto systemInfo, DateTime timestamp)
+        public MeasurementDto(Measurement measurement)
         {
-            SystemInfo = systemInfo;
-            Timestamp = timestamp;
+            SystemInfo = new SystemInfoDto(measurement.SystemInfo);
+            Timestamp = measurement.Timestamp;
         }
     }
 }

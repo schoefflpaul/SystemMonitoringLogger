@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using SystemMonitoringLogger.Entities;
 
 namespace SystemMonitoringLogger.Dtos
 {
@@ -10,10 +11,10 @@ namespace SystemMonitoringLogger.Dtos
         public double Used { get; set; }
         public double Max { get; set; }
 
-        public RamDto(double used, double max)
+        public RamDto(Ram ram)
         {
-            Used = used;
-            Max = max;
+            Used = ram.Used;
+            Max = ram.Max;
         }
     }
 }
