@@ -37,7 +37,7 @@ namespace SystemMonitoringLogger.Services
             var sensorValue = JsonConvert.DeserializeObject<Measurement>(message);
             var context = _provider.ServiceProvider.GetService<SystemMonitoringLoggerContext>();
             context.Measurements.Add(sensorValue);
-            context.SaveChanges();
+            await context.SaveChangesAsync();
         }
     }
 }

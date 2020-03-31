@@ -9,6 +9,7 @@ using SystemMonitoringLogger.Entities;
 using SystemMonitoringLogger.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
+using SystemMonitoringLogger.Dtos;
 
 namespace SystemMonitoringLogger.Controllers
 {
@@ -26,12 +27,13 @@ namespace SystemMonitoringLogger.Controllers
         [HttpGet]
         [Route("{deviceName}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<Measurement[]> GetStatisticsForDevice(string deviceName, int pageIndex = 0, int pageSize = 100)
+        public async Task<MeasurementDto[]> GetStatisticsForDevice(string deviceName, int pageIndex = 0, int pageSize = 100)
         {
             return await _context.Measurements
                 .Include(m => m.SystemInfo).ThenInclude(s => s.Cpu)
                 .Include(m => m.SystemInfo).ThenInclude(s => s.Ram)
                 .Where(m => m.SystemInfo.Name == deviceName)
+                .Select(mGroup => new MeasurementDto(new SystemInfoDto(deviceName, new CpuDto(mGroup.SystemInfo.Cpu.Baseclock, mGroup.SystemInfo.Cpu.Currentclock, mGroup.SystemInfo.Cpu.Utilisation), new RamDto(mGroup.SystemInfo.Ram.Used, mGroup.SystemInfo.Ram.Max)), mGroup.Timestamp))
                 .OrderByDescending(m => m.Timestamp)
                 .Skip(pageIndex * pageSize)
                 .Take(pageSize)
@@ -42,9 +44,17 @@ namespace SystemMonitoringLogger.Controllers
         [HttpGet]
         [Route("{deviceName}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<Measurement[]> GetStatisticsForDeviceInTimeFrame(string deviceName, DateTime from, DateTime to ,int pageIndex = 0, int pageSize = 100)
+        public async Task<MeasurementDto[]> GetStatisticsForDeviceInTimeFrame(string deviceName, DateTime from, DateTime to ,int pageIndex = 0, int pageSize = 100)
         {
-            throw new NotImplementedException();
+            return await _context.Measurements
+                .Include(m => m.SystemInfo).ThenInclude(s => s.Cpu)
+                .Include(m => m.SystemInfo).ThenInclude(s => s.Ram)
+                .Where(m => m.SystemInfo.Name == deviceName && m.Timestamp >= from && m.Timestamp <= to)
+                .Select(mGroup => new MeasurementDto(new SystemInfoDto(deviceName, new CpuDto(mGroup.SystemInfo.Cpu.Baseclock, mGroup.SystemInfo.Cpu.Currentclock, mGroup.SystemInfo.Cpu.Utilisation), new RamDto(mGroup.SystemInfo.Ram.Used, mGroup.SystemInfo.Ram.Max)), mGroup.Timestamp))
+                .OrderByDescending(m => m.Timestamp)
+                .Skip(pageIndex * pageSize)
+                .Take(pageSize)
+                .ToArrayAsync();
         }
     }
 }

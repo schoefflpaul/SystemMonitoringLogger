@@ -7,5 +7,13 @@ namespace SystemMonitoringLogger.Dtos
 {
     public class RamDto
     {
+        public double Used { get; set; }
+        public double Max { get; set; }
+
+        public RamDto(double used, double max)
+        {
+            Used = used;
+            Max = max;
+        }
     }
 }
