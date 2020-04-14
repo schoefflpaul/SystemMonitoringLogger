@@ -6,10 +6,12 @@ using Microsoft.AspNetCore.Mvc;
 using SystemMonitoringLogger.Data;
 using Microsoft.EntityFrameworkCore;
 using SystemMonitoringLogger.Dtos;
+using Microsoft.AspNetCore.Cors;
 
 namespace SystemMonitoringLogger.Controllers
 {
     [Route("api/[controller]")]
+    [EnableCors("AllowMyOrigin")]
     [ApiController]
     public class StatisticsController : ControllerBase
     {

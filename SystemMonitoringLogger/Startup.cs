@@ -28,7 +28,8 @@ namespace SystemMonitoringLogger
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services.AddControllers()
+                .AddJsonOptions(opts => opts.JsonSerializerOptions.PropertyNamingPolicy = null);
 
             services.AddDbContext<SystemMonitoringLoggerContext>(options =>
                     options.UseSqlServer(Configuration.GetConnectionString("SystemMonitoringLoggerContext")));
@@ -54,7 +55,10 @@ namespace SystemMonitoringLogger
                     };
                 };
             });
-
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowMyOrigin", builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
+            });
 
         }
 
@@ -70,12 +74,14 @@ namespace SystemMonitoringLogger
 
             app.UseRouting();
 
-            app.UseAuthorization();
+            app.UseCors("AllowMyOrigin");
+
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
             });
+
 
             app.UseOpenApi();
             app.UseSwaggerUi3();
