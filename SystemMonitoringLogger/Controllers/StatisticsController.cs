@@ -7,60 +7,60 @@ using SystemMonitoringLogger.Data;
 using Microsoft.EntityFrameworkCore;
 using SystemMonitoringLogger.Dtos;
 using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Authorization;
+using SystemMonitoringLogger.DataAccess;
+using System.Collections.Generic;
+using SystemMonitoringLogger.Entities;
 
 namespace SystemMonitoringLogger.Controllers
 {
     [Route("api/[controller]")]
     [EnableCors("AllowMyOrigin")]
+    //[Authorize]
     [ApiController]
     public class StatisticsController : ControllerBase
     {
-        private readonly SystemMonitoringLoggerContext _context;
+        private readonly SystemMonitoringDataAccessLayer accessLayerContext = new SystemMonitoringDataAccessLayer();
 
-        public StatisticsController(SystemMonitoringLoggerContext context)
+        [HttpGet("{id}")]
+        public Task<Measurement> Get(string id)
         {
-            _context = context;
+            return accessLayerContext.GetMeasurementData(id);
+        }
+
+        [HttpPost]
+        public void Post([FromForm] Measurement measurement)
+        {
+            accessLayerContext.AddMeasurement(measurement);
+        }
+
+        [HttpPut]
+        public void Put([FromForm]Measurement measurement)
+        {
+            accessLayerContext.UpdateMeasurement(measurement);
+        }
+
+        [HttpDelete("{id}")]
+        public void Delete(string id)
+        {
+            accessLayerContext.DeleteMeasurement(id);
+
         }
 
         [HttpGet]
-        [Route("{deviceName}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<MeasurementDto[]>> GetStatisticsForDevice(string deviceName, int pageIndex = 0, int pageSize = 100)
         {
-            return await _context.Measurements
-                .Include(m => m.SystemInfo).ThenInclude(s => s.Cpu)
-                .Include(m => m.SystemInfo).ThenInclude(s => s.Ram)
+            var measurementsDb = await accessLayerContext.GetAllMeasurements();
+
+            return measurementsDb
                 .Where(m => m.SystemInfo.Name == deviceName)
                 .OrderByDescending(m => m.Timestamp)
                 .Skip(pageIndex * pageSize)
                 .Take(pageSize)
                 .Select(m => new MeasurementDto(m))
-                .ToArrayAsync();
+                .ToArray();
         }
-        //DESKTOP-JPLO7L8
 
-        [HttpGet]
-        [Route("timeframe/{deviceName}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<MeasurementDto[]>> GetStatisticsForDeviceInTimeFrame(string deviceName, string from, string to ,int pageIndex = 0, int pageSize = 100)
-        {
-            DateTime fromTime, toTime;
-
-            if (DateTime.TryParse(from, out fromTime) && DateTime.TryParse(to, out toTime))
-            {
-                return await _context.Measurements
-                    .Include(m => m.SystemInfo).ThenInclude(s => s.Cpu)
-                    .Include(m => m.SystemInfo).ThenInclude(s => s.Ram)
-                    .Where(m => m.SystemInfo.Name == deviceName && m.Timestamp >= fromTime && m.Timestamp <= toTime)
-                    .OrderByDescending(m => m.Timestamp)
-                    .Skip(pageIndex * pageSize)
-                    .Take(pageSize)
-                    .Select(m => new MeasurementDto(m))
-                    .ToArrayAsync();
-
-            }
-
-            return BadRequest("Date time not valid");
-        }
     }
 }

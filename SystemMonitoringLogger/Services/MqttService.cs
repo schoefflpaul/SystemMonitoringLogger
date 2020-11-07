@@ -10,17 +10,19 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using uPLibrary.Networking.M2Mqtt;
 using uPLibrary.Networking.M2Mqtt.Messages;
+using SystemMonitoringLogger.DataAccess;
 
 namespace SystemMonitoringLogger.Services
 {
     public class MqttService
     {
-        private readonly IServiceScope _provider;
+        private readonly SystemMonitoringDataAccessLayer _accessLayerContext;
+
         public string Topic { get; }
 
-        public MqttService(IServiceScope provider,string topic)
+        public MqttService(SystemMonitoringDataAccessLayer accessLayerContext, string topic)
         {
-            _provider = provider;
+            _accessLayerContext = accessLayerContext;
             Topic = topic;
         }
 
@@ -35,9 +37,7 @@ namespace SystemMonitoringLogger.Services
         {
             var message = Encoding.Default.GetString(e.Message);
             var sensorValue = JsonConvert.DeserializeObject<Measurement>(message);
-            var context = _provider.ServiceProvider.GetService<SystemMonitoringLoggerContext>();
-            context.Measurements.Add(sensorValue); 
-            context.SaveChanges();
+            _accessLayerContext.AddMeasurement(sensorValue);
         }
     }
 }
