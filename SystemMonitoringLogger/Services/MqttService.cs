@@ -37,6 +37,7 @@ namespace SystemMonitoringLogger.Services
         {
             var message = Encoding.Default.GetString(e.Message);
             var sensorValue = JsonConvert.DeserializeObject<Measurement>(message);
+            sensorValue.Timestamp = sensorValue.Timestamp.ToUniversalTime();
             _accessLayerContext.AddMeasurement(sensorValue);
         }
     }

@@ -30,23 +30,6 @@ namespace SystemMonitoringLogger
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            /*
-            services
-                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
-                {
-                    options.Authority = "https://securetoken.google.com/systemmonitoring-995cc";
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuer = true,
-                        ValidIssuer = "https://securetoken.google.com/systemmonitoring-995cc",
-                        ValidateAudience = true,
-                        ValidAudience = "systemmonitoring-995cc",
-                        ValidateLifetime = true
-                    };
-                });
-                */
-
             services.AddControllers()
                 .AddJsonOptions(opts => opts.JsonSerializerOptions.PropertyNamingPolicy = null);
 
@@ -107,9 +90,9 @@ namespace SystemMonitoringLogger
 
             app.UseOpenApi();
             app.UseSwaggerUi3();
+            //Task.Run(() => new MqttService(new DataAccess.SystemMonitoringDataAccessLayer(),"systemInfo").Listen());
 
-            Task.Run(() => new MqttService(new DataAccess.SystemMonitoringDataAccessLayer(),"systemInfo").Listen());
-
+            Task.Run(() => new PubSub(new DataAccess.SystemMonitoringDataAccessLayer()).PullMessagesAsync("pullSystemInfo", true));
         }
     }
 }

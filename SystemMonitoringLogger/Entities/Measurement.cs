@@ -14,7 +14,7 @@ namespace SystemMonitoringLogger.Entities
         [FirestoreProperty]
         public SystemInfo SystemInfo { get; set; }
 
-        [DataType(DataType.DateTime)]
+        [FirestoreProperty]
         [Timestamp]
         public DateTime Timestamp { get; set; }
     }
