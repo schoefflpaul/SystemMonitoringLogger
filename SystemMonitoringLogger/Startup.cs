@@ -90,7 +90,7 @@ namespace SystemMonitoringLogger
             app.UseSwaggerUi3();
             //Task.Run(() => new MqttService(new DataAccess.SystemMonitoringDataAccessLayer(),"systemInfo").Listen());
 
-            Task.Run(() => new PubSub(new DataAccess.SystemMonitoringDataAccessLayer()));
+            Task.Run(() => new PubSub(new DataAccess.SystemMonitoringDataAccessLayer()).PullMessagesAsync("adminpull", true));
         }
     }
 }

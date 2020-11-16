@@ -16,7 +16,6 @@ namespace SystemMonitoringLogger.Controllers
 {
     [Route("api/[controller]")]
     [EnableCors("AllowMyOrigin")]
-    //[Authorize]
     [ApiController]
     public class StatisticsController : ControllerBase
     {

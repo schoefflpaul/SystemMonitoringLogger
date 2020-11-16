@@ -14,9 +14,7 @@ namespace SystemMonitoringLogger.DataAccess
         FirestoreDb fireStoreDb;
         public SystemMonitoringDataAccessLayer()
         {
-            string filepath = "D:\\Schule\\NVS Lackinger\\SystemMonitoringLogger\\systemmonitoring-995cc-c533194931d4.json";
-            Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", filepath);
-            projectId = "systemmonitoring-995cc";
+            projectId = "systemmonitoring-294918";
             fireStoreDb = FirestoreDb.Create(projectId);
         }
         public async Task<IEnumerable<Measurement>> GetAllMeasurements()
