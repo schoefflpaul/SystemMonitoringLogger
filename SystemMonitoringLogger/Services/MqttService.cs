@@ -33,6 +33,7 @@ namespace SystemMonitoringLogger.Services
             client.MqttMsgPublishReceived += OnReceiveMessage;
             client.Subscribe(new []{Topic},new []{ MqttMsgBase.QOS_LEVEL_AT_MOST_ONCE });
         } 
+
         private void OnReceiveMessage(object sender, MqttMsgPublishEventArgs e)
         {
             var message = Encoding.Default.GetString(e.Message);

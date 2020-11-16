@@ -13,8 +13,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using SystemMonitoringLogger.Data;
 using SystemMonitoringLogger.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
 
 namespace SystemMonitoringLogger
 {
@@ -92,7 +90,7 @@ namespace SystemMonitoringLogger
             app.UseSwaggerUi3();
             //Task.Run(() => new MqttService(new DataAccess.SystemMonitoringDataAccessLayer(),"systemInfo").Listen());
 
-            Task.Run(() => new PubSub(new DataAccess.SystemMonitoringDataAccessLayer()).PullMessagesAsync("pullSystemInfo", true));
+            Task.Run(() => new PubSub(new DataAccess.SystemMonitoringDataAccessLayer()));
         }
     }
 }
